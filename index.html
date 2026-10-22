@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENOKIOSK</title>
+    <!-- Tailwind CSS ライブラリの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- サイバーアイコン用 FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts: Orbitron, Share Tech Mono, Noto Sans JP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="./enokiosk.jpg" />
+    <!-- OGP (Open Graph Protocol) 設定 -->
+    <meta property="og:title" content="ENOKIOSK SYSTEM | エノキ電気" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kiosk.enoki.xyz" />
+    <meta property="og:image" content="https://kiosk.enoki.xyz/enokiosk.jpg" />
+    <meta
+      property="og:description"
+      content="関東の交通情報、東京・埼玉・千葉の天気予報、ニュース速報をサイバーパンクなUIで常時表示するKIOSKモード専用ハイテク情報ダッシュボード。"
+    />
+    <meta property="og:site_name" content="ENOKIOSK SYSTEM" />
+    <meta property="og:locale" content="ja_JP" />
+
+    <!-- Twitter Card 設定 -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ENOKIOSK SYSTEM | エノキ電気" />
+    <meta
+      name="twitter:description"
+      content="関東の交通情報、東京・埼玉・千葉の天気予報、ニュース速報をサイバーパンクなUIで常時表示するKIOSKモード専用ハイテク情報ダッシュボード。"
+    />
+    <meta name="twitter:image" content="https://kiosk.enoki.xyz/enokiosk.jpg" />
+
+    <style>
+      /* KIOSKモード必須設定: カーソルを完全非表示にし、テキスト選択を無効化 */
+      * {
+        cursor: none !important;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+      }
+
+      body {
+        background-color: #030712;
+        color: #e5e7eb;
+        font-family: 'Noto Sans JP', sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* 英文サイバーフォント設定 */
+      .font-orbitron {
+        font-family: 'Orbitron', sans-serif;
+      }
+
+      /* 等幅テクノフォント設定 */
+      .font-mono-tech {
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      /* サイバーパンク風走査線オーバーレイ効果 */
+      .scanline-overlay {
+        background:
+          linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+          linear-gradient(
+            90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03)
+          );
+        background-size:
+          100% 3px,
+          6px 100%;
+        pointer-events: none;
+      }
+
+      /* 背景SFグリッド線効果 */
+      .grid-bg {
+        background-size: 40px 40px;
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(0, 243, 255, 0.03) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(0, 243, 255, 0.03) 1px,
+            transparent 1px
+          );
+      }
+
+      /* 発光グラスモーフィズムカードのスタイリング */
+      .cyber-card {
+        background: rgba(10, 16, 30, 0.75);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 243, 255, 0.2);
+        box-shadow:
+          0 0 15px rgba(0, 243, 255, 0.05),
+          inset 0 0 15px rgba(0, 243, 255, 0.02);
+        position: relative;
+      }
+
+      /* カード四隅のサイバー風アクセント枠線 */
+      .cyber-card::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        width: 8px;
+        height: 8px;
+        border-top: 2px solid #00f3ff;
+        border-left: 2px solid #00f3ff;
+      }
+
+      .cyber-card::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 8px;
+        height: 8px;
+        border-bottom: 2px solid #00f3ff;
+        border-right: 2px solid #00f3ff;
+      }
+
+      /* ネオングローシャドウ（水色・琥珀色・赤色） */
+      .glow-cyan {
+        text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+      }
+
+      .glow-amber {
+        text-shadow: 0 0 10px rgba(255, 157, 0, 0.6);
+      }
+
+      .glow-red {
+        text-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+      }
+
+      /* カスタムスクロールバー（サイバーテーマ） */
+      .custom-scroll::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scroll::-webkit-scrollbar-track {
+        background: rgba(0, 243, 255, 0.05);
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: rgba(0, 243, 255, 0.3);
+        border-radius: 2px;
+      }
+
+      /* レーダー風点滅パルスアニメーション */
+      @keyframes radar-ping {
+        0% {
+          transform: scale(0.95);
+          opacity: 0.8;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.4;
+        }
+        100% {
+          transform: scale(0.95);
+          opacity: 0.8;
+        }
+      }
+      .radar-pulse {
+        animation: radar-ping 3s infinite ease-in-out;
+      }
+    </style>
+  </head>
+  <body
+    class="grid-bg flex flex-col justify-between p-4 relative select-none h-screen w-screen overflow-hidden"
+  >
+    <!-- 走査線ビジュアルオーバーレイ（最前面） -->
+    <div
+      class="scanline-overlay absolute inset-0 z-50 pointer-events-none"
+    ></div>
+
+    <!-- ヘッダーバー（画面上部） -->
+    <header
+      class="cyber-card p-3.5 rounded-lg mb-3 flex justify-between items-center z-10 border-b-2 border-cyan-500/40 shrink-0"
+    >
+      <div class="flex items-center space-x-4">
+        <!-- レーダー風アイコン -->
+        <div
+          class="w-10 h-10 rounded bg-cyan-950/80 border border-cyan-400 flex items-center justify-center text-cyan-400 text-xl font-bold radar-pulse"
+        >
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div>
+          <h1
+            class="font-orbitron text-2xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-200 to-cyan-500"
+          >
+            ENOKIOSK SYSTEM by エノキ電気
+          </h1>
+          <p class="text-xs text-cyan-400/70 font-mono-tech tracking-wider">
+            システム状態: <span class="text-emerald-400">オンライン</span> |
+            更新間隔: <span class="text-amber-400">10分</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- リアルタイム時計・日付表示 -->
+      <div class="text-right">
+        <div
+          id="live-time"
+          class="font-mono-tech text-3xl font-bold text-cyan-300 glow-cyan leading-none"
+        >
+          00:00:00
+        </div>
+        <div
+          id="live-date"
+          class="font-mono-tech text-xs text-cyan-500/80 tracking-widest mt-1"
+        >
+          2000.00.00 [金]
+        </div>
+      </div>
+    </header>
+
+    <!-- メインダッシュボードコンテンツ（左右2列レイアウト） -->
+    <main class="grid grid-cols-12 gap-4 flex-1 overflow-hidden z-10 min-h-0">
+      <!-- 左カラム: 交通情報パネル（幅7列分） -->
+      <section
+        class="col-span-12 lg:col-span-7 cyber-card rounded-lg p-4 flex flex-col border-l-2 border-cyan-500/50 h-full overflow-hidden"
+      >
+        <div
+          class="flex justify-between items-center pb-2.5 mb-2.5 border-b border-cyan-500/20 shrink-0"
+        >
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-car-burst text-amber-400 text-lg"></i>
+            <h2
+              class="font-orbitron text-lg font-bold text-amber-400 tracking-wider"
+            >
+              交通情報 // TRAFFIC ADVISORIES
+            </h2>
+          </div>
+          <!-- 規制件数バッジ -->
+          <span
+            id="traffic-count-badge"
+            class="px-2.5 py-0.5 text-xs font-mono-tech rounded bg-amber-950/80 border border-amber-500/50 text-amber-300"
+          >
+            -- 件
+          </span>
+        </div>
+
+        <!-- 交通情報更新日時ステータス -->
+        <div
+          id="traffic-timestamp"
+          class="text-xs font-mono-tech text-cyan-400/70 mb-3 flex items-center justify-between shrink-0"
+        >
+          <span
+            ><i class="fa-regular fa-clock mr-1"></i>取得日時:
+            読み込み中...</span
+          >
+          <span id="traffic-sync-status" class="text-emerald-400 text-xs"
+            >● リアルタイム同期中</span
+          >
+        </div>
+
+        <!-- 交通情報一覧スクロールコンテナ -->
+        <div
+          id="traffic-container"
+          class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1.5"
+        >
+          <!-- JavaScriptにより動的に生成されます -->
+        </div>
+      </section>
+
+      <!-- 右カラム: 天気情報 & ニュース（幅5列分、上下50%分割） -->
+      <div
+        class="col-span-12 lg:col-span-5 grid grid-rows-2 gap-4 h-full overflow-hidden"
+      >
+        <!-- 右上: 天気予報パネル（東京・埼玉・千葉対応、高さ50%） -->
+        <section
+          class="cyber-card rounded-lg p-4 flex flex-col justify-between border-t-2 border-cyan-500/50 h-full overflow-hidden min-h-0"
+        >
+          <div class="flex flex-col flex-1 min-h-0">
+            <div
+              class="flex justify-between items-center pb-2 mb-2 border-b border-cyan-500/20 shrink-0"
+            >
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-cloud-sun-rain text-cyan-400 text-lg"></i>
+                <h2
+                  class="font-orbitron text-base font-bold text-cyan-300 tracking-wider"
+                >
+                  天気予報 // WEATHER REGIONS
+                </h2>
+              </div>
+              <!-- 地域切り替えタブ表示 -->
+              <div
+                id="region-tabs"
+                class="flex space-x-1 font-mono-tech text-xs"
+              >
+                <!-- JavaScriptにより動的に生成されます -->
+              </div>
+            </div>
+
+            <!-- 3地域の天候カードグリッド -->
+            <div
+              id="weather-cards-container"
+              class="grid grid-cols-3 gap-2 my-1 shrink-0"
+            >
+              <!-- 東京・埼玉・千葉のカードが生成されます -->
+            </div>
+
+            <!-- 選択中の地域の天気概況（詳細文） -->
+            <div class="mt-2 flex-1 flex flex-col min-h-0">
+              <div
+                class="text-xs font-mono-tech text-cyan-400/80 mb-1 flex items-center justify-between shrink-0"
+              >
+                <span
+                  ><i class="fa-solid fa-align-left mr-1"></i
+                  ><span id="overview-region-label">東京</span>の天気概況</span
+                >
+                <span id="weather-timestamp" class="text-[10px] text-slate-500"
+                  >更新: ----/--/-- --:--</span
+                >
+              </div>
+              <div
+                id="weather-summary"
+                class="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-2.5 rounded border border-slate-800/80 flex-1 overflow-y-auto custom-scroll whitespace-pre-line"
+              >
+                読み込み中...
+              </div>
+            </div>
+          </div>
+
+          <!-- 地域自動切り替えプログレスバー（10秒） -->
+          <div
+            class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-2 shrink-0"
+          >
+            <div
+              id="weather-progress"
+              class="bg-gradient-to-r from-cyan-500 to-teal-400 h-full w-0 transition-all duration-100 linear"
+            ></div>
+          </div>
+        </section>
+
+        <!-- 右下: ニュース表示パネル（高さ50%、上下2件分割表示） -->
+        <section
+          class="cyber-card rounded-lg p-4 flex flex-col justify-between border-r-2 border-cyan-500/50 h-full overflow-hidden min-h-0"
+        >
+          <div class="flex flex-col flex-1 min-h-0">
+            <div
+              class="flex justify-between items-center pb-2 mb-2 border-b border-cyan-500/20 shrink-0"
+            >
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-newspaper text-teal-400 text-base"></i>
+                <h2
+                  class="font-orbitron text-base font-bold text-teal-300 tracking-wider"
+                >
+                  ニュース // HEADLINES
+                </h2>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span
+                  id="news-index"
+                  class="text-xs font-mono-tech text-cyan-400"
+                  >0-0 / 0</span
+                >
+                <div
+                  class="w-2 h-2 rounded-full bg-teal-400 animate-ping"
+                ></div>
+              </div>
+            </div>
+
+            <!-- ニュース表示領域（上下50%ずつ2件表示） -->
+            <div
+              class="flex-1 flex flex-col gap-2 min-h-0 relative overflow-hidden my-1"
+            >
+              <!-- 上側ニュース (#1) -->
+              <div
+                id="newsItem0"
+                class="flex-1 flex flex-col bg-slate-900/80 border border-teal-500/30 rounded-lg p-2.5 transition-opacity duration-500 overflow-hidden min-h-0"
+              >
+                <div class="flex items-center space-x-2 mb-1 shrink-0">
+                  <span
+                    class="px-1.5 py-0.5 text-[10px] font-mono-tech rounded bg-teal-950 border border-teal-500/50 text-teal-300"
+                  >
+                    NEWS #1
+                  </span>
+                </div>
+                <h3
+                  id="newsTitle0"
+                  class="font-bold text-xs text-slate-100 leading-snug mb-1 shrink-0 line-clamp-1"
+                >
+                  ニュース情報を取得しています...
+                </h3>
+                <p
+                  id="newsDesc0"
+                  class="text-[11px] text-slate-300 leading-relaxed overflow-y-auto custom-scroll flex-1"
+                >
+                  --
+                </p>
+              </div>
+
+              <!-- 下側ニュース (#2) -->
+              <div
+                id="newsItem1"
+                class="flex-1 flex flex-col bg-slate-900/80 border border-teal-500/30 rounded-lg p-2.5 transition-opacity duration-500 overflow-hidden min-h-0"
+              >
+                <div class="flex items-center space-x-2 mb-1 shrink-0">
+                  <span
+                    class="px-1.5 py-0.5 text-[10px] font-mono-tech rounded bg-teal-950 border border-teal-500/50 text-teal-300"
+                  >
+                    NEWS #2
+                  </span>
+                </div>
+                <h3
+                  id="newsTitle1"
+                  class="font-bold text-xs text-slate-100 leading-snug mb-1 shrink-0 line-clamp-1"
+                >
+                  ニュース情報を取得しています...
+                </h3>
+                <p
+                  id="newsDesc1"
+                  class="text-[11px] text-slate-300 leading-relaxed overflow-y-auto custom-scroll flex-1"
+                >
+                  --
+                </p>
+              </div>
+            </div>
+
+            <!-- 16秒間の次ニュース移行プログレスバー -->
+            <div
+              class="w-full bg-slate-800 h-1 rounded-full overflow-hidden mt-1 shrink-0"
+            >
+              <div
+                id="news-progress"
+                class="bg-gradient-to-r from-teal-500 to-cyan-400 h-full w-0 transition-all duration-100 linear"
+              ></div>
+            </div>
+          </div>
+
+          <!-- ニュース全周完了後の再取得ステータスカウンター -->
+          <div
+            class="bg-slate-950/60 px-2.5 py-1 rounded border border-cyan-900/50 flex justify-between items-center text-[11px] font-mono-tech text-cyan-400/80 shrink-0 mt-2"
+          >
+            <span class="flex items-center"
+              ><i class="fa-solid fa-arrows-rotate mr-1.5 text-cyan-400"></i
+              >全件表示完了時に自動再取得</span
+            >
+            <span id="news-cycle-count" class="text-cyan-300 font-bold"
+              >周回数: #1</span
+            >
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- フッター情報表示バー -->
+    <footer
+      class="cyber-card p-2.5 rounded-lg mt-3 flex justify-between items-center text-xs font-mono-tech text-slate-400 z-10 border-t border-cyan-500/30 shrink-0"
+    >
+      <div class="flex items-center space-x-6">
+        <span class="flex items-center"
+          ><i class="fa-solid fa-display mr-2 text-cyan-400"></i
+          >KIOSKモード動作中</span
+        >
+        <span class="flex items-center"
+          ><i class="fa-solid fa-network-wired mr-2 text-emerald-400"></i
+          >接続状態: 正常</span
+        >
+        <span id="data-status-bar" class="text-cyan-300"
+          >自動更新有効 (10分周期)</span
+        >
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="text-slate-500">システムID: KSK-2026-KANTO</span>
+        <span
+          class="px-2 py-0.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold"
+          >表示モード: 全画面</span
+        >
+      </div>
+    </footer>
+
+    <!-- システム制御用JavaScriptコード -->
+    <script>
+      // フォールバック用交通情報モックデータ（外部PHP非アクセス時に使用）
+      const MOCK_TRAFFIC = {
+        time: '0000年00月00日 99時99分時点での関東の交通情報',
+        datas: [
+          '（モックデータ）【都心環状線】（内回） 新富町出口で工事のため、通行止',
+          '（モックデータ）【都心環状線】（外回） 新富町出口で工事のため、通行止',
+          '（モックデータ）【中央環状線】（外回） 初台南出口で工事のため、通行止',
+        ],
+      }
+
+      // フォールバック用天気情報モックデータ（東京・埼玉・千葉対応）
+      const MOCK_WEATHER = {
+        取得日: '2000年00月00日 99時99分',
+        datas: {
+          東京: {
+            現在の気温: '99.9 度',
+            '現在の降水量(10分あたり)': '999 mm',
+            翌日の天気: '晴れ',
+            天気概況:
+              '\n関東甲信地方は高気圧に緩やかに覆われています。一方、伊豆諸島付近は気圧の谷となっています。\n東京地方は、曇りとなっています。\n２２日は、高気圧に覆われますが、気圧の谷や湿った空気の影響を受ける見込みです。このため、曇りとなるでしょう。\n２３日は、引き続き高気圧に覆われますが、湿った空気の影響を受ける見込みです。このため、晴れで朝晩は曇りとなるでしょう。',
+          },
+          埼玉: {
+            現在の気温: '99.9 度',
+            '現在の降水量(10分あたり)': '999 mm',
+            翌日の天気: '晴れ',
+            天気概況:
+              '\n関東甲信地方は高気圧に緩やかに覆われています。一方、伊豆諸島付近は気圧の谷となっています。\n埼玉県は、曇りや晴れとなっています。\n２２日は、高気圧に覆われますが、気圧の谷や湿った空気の影響を受ける見込みです。このため、曇りとなるでしょう。\n２３日は、引き続き高気圧に覆われますが、湿った空気の影響を受ける見込みです。このため、晴れで朝晩は曇りとなるでしょう。',
+          },
+          千葉: {
+            現在の気温: '99.9 度',
+            '現在の降水量(10分あたり)': '999 mm',
+            翌日の天気: '晴れ',
+            天気概況:
+              '\n関東甲信地方は高気圧に緩やかに覆われています。一方、伊豆諸島付近は気圧の谷となっています。\n千葉県は、曇りや晴れとなっています。\n２２日は、高気圧に覆われますが、気圧の谷や湿った空気の影響を受けるため、曇り時々晴れとなるでしょう。\n２３日は、引き続き高気圧に覆われますが、湿った空気の影響を受けるため、晴れ朝晩曇りとなる見込みです。\n千葉県の太平洋沿岸の海上では、２２日から２３日にかけて、うねりを伴い波が高いでしょう。船舶は高波に注意してください。\n＜天気変化等の留意点＞\n千葉県の２２日１８時から２３日１８時までの予想降水量は、１時間降水量（多い所）０ミリ、２４時間降水量（多い所）０ミリの見込みです。',
+          },
+        },
+      }
+
+      // フォールバック用ニュースモックデータ
+      const MOCK_NEWS = [
+        {
+          title:
+            '（モックニュース）PD 100W給電/HDMI映像出力/USBハブ機能を備えた充電器「CORE GO」が発売(AKIBA PC Hotline!)',
+          description:
+            '（表示の一例）USB PD充電器、HDMI出力、USBハブの3つの機能を備えた「CORE GO（GC313）」が発売された。【この記事に関する別の画像を見る】 店頭価格は12,980円。■ HDMIへの映像出力や最',
+        },
+        {
+          title:
+            '（モックニュース）2.5インチSATA SSD「SANDISK 520」の500GBと4TBが店頭入荷(AKIBA PC Hotline!)',
+          description:
+            '（表示の一例）Sandiskの2.5インチSATA SSD「SANDISK 520」シリーズの500GB（SDSS51500GAB-000G0）と4TB（SDSS51400TAB-000G0）が一部ショップに入荷し',
+        },
+        {
+          title:
+            '（モックニュース）HAMAKEN WORKSの65W出力USB充電器が2製品、Type-Cケーブル付きで2,500円から(AKIBA PC Hotline!)',
+          description:
+            '（表示の一例）65W PD出力に対応した浜田電機オリジナルUSB充電器が2モデル登場した。 店頭価格はUSB Type-C×2ポートの「HW-AC065WCCWH」が2,500円、USB Type-C×2ポート+U',
+        },
+      ]
+
+      // システム状態の保持変数
+      let weatherData = null
+      let selectedRegion = '東京'
+      let regionCycleTimer = null
+      const WEATHER_REGION_DURATION = 10000 // 天気地域切り替え間隔（10秒）
+      let newsData = []
+      let currentNewsIndex = 0
+      let newsCycleCounter = 1
+      let newsTimer = null
+      const NEWS_DISPLAY_DURATION = 16000 // ニュース表示時間（16秒）
+
+      // 時計表示の毎秒更新処理
+      function updateClock() {
+        const now = new Date()
+        const h = String(now.getHours()).padStart(2, '0')
+        const m = String(now.getMinutes()).padStart(2, '0')
+        const s = String(now.getSeconds()).padStart(2, '0')
+        document.getElementById('live-time').innerText = `${h}:${m}:${s}`
+
+        const year = now.getFullYear()
+        const month = String(now.getMonth() + 1).padStart(2, '0')
+        const date = String(now.getDate()).padStart(2, '0')
+        const days = ['日', '月', '火', '水', '木', '金', '土']
+        const dayName = days[now.getDay()]
+        document.getElementById('live-date').innerText =
+          `${year}.${month}.${date} [${dayName}]`
+      }
+
+      // 外部PHP（./getJartic.php）から交通情報を取得
+      async function fetchTrafficData() {
+        try {
+          const res = await fetch('./getJartic.php', { cache: 'no-cache' })
+          if (!res.ok) throw new Error('ネットワークエラー')
+          const data = await res.json()
+          renderTraffic(data)
+        } catch (err) {
+          console.warn(
+            '外部交通情報の取得に失敗したため、モックデータを使用します:',
+            err,
+          )
+          renderTraffic(MOCK_TRAFFIC)
+        }
+      }
+
+      // 交通情報一覧のHTML描画処理
+      function renderTraffic(data) {
+        document.getElementById('traffic-timestamp').innerHTML =
+          `<span><i class="fa-regular fa-clock mr-1"></i>${data.time || '取得済'}</span><span class="text-emerald-400 text-xs">● リアルタイム同期中</span>`
+        const container = document.getElementById('traffic-container')
+        container.innerHTML = ''
+
+        const list = data.datas || []
+        document.getElementById('traffic-count-badge').innerText =
+          `${list.length} 件`
+
+        if (list.length === 0) {
+          container.innerHTML = `<div class="text-center text-xs text-slate-500 py-12">現在規制情報はありません</div>`
+          return
+        }
+
+        list.forEach((item) => {
+          const card = document.createElement('div')
+          card.className =
+            'p-3 rounded bg-slate-900/80 border border-slate-800/90 text-xs flex items-start space-x-3 hover:border-cyan-500/40 transition-colors'
+
+          let iconClass = 'fa-triangle-exclamation text-amber-400'
+
+          // 規制内容に応じたアイコン・警告色の分岐
+          if (item.includes('通行止')) {
+            iconClass = 'fa-ban text-red-400 glow-red animate-pulse'
+          } else if (item.includes('車線規制')) {
+            iconClass = 'fa-triangle-exclamation text-amber-400'
+          }
+
+          card.innerHTML = `
+                    <div class="mt-0.5"><i class="fa-solid ${iconClass}"></i></div>
+                    <div class="flex-1">
+                        <div class="text-slate-200 leading-relaxed font-medium">${item}</div>
+                    </div>
+                `
+          container.appendChild(card)
+        })
+      }
+
+      // 外部PHP（./getWeather.php）から天気情報を取得
+      async function fetchWeatherData() {
+        try {
+          const res = await fetch('./getWeather.php', { cache: 'no-cache' })
+          if (!res.ok) throw new Error('ネットワークエラー')
+          const data = await res.json()
+          weatherData = data
+          renderWeather()
+        } catch (err) {
+          console.warn(
+            '外部天気情報の取得に失敗したため、モックデータを使用します:',
+            err,
+          )
+          weatherData = MOCK_WEATHER
+          renderWeather()
+        }
+      }
+
+      // 天気文字列に応じたアイコンHTMLの生成ヘルパー
+      function getWeatherIcon(weatherStr) {
+        if (!weatherStr)
+          return '<i class="fa-solid fa-cloud text-slate-300"></i>'
+        if (weatherStr.includes('晴')) {
+          return '<i class="fa-solid fa-sun text-amber-400"></i>'
+        } else if (weatherStr.includes('雨')) {
+          return '<i class="fa-solid fa-cloud-showers-heavy text-blue-400"></i>'
+        } else {
+          return '<i class="fa-solid fa-cloud text-slate-300"></i>'
+        }
+      }
+
+      // 天気情報パネル（複数地域対応）の描画処理
+      function renderWeather() {
+        if (!weatherData) return
+
+        document.getElementById('weather-timestamp').innerText =
+          `更新: ${weatherData['取得日'] || ''}`
+        const datas = weatherData.datas || {}
+        const regions = Object.keys(datas)
+
+        if (regions.length === 0) return
+
+        // 地域切り替え用タブの描画
+        const tabsContainer = document.getElementById('region-tabs')
+        tabsContainer.innerHTML = ''
+        regions.forEach((reg) => {
+          const isSelected = reg === selectedRegion
+          const tab = document.createElement('span')
+          tab.className = `px-2 py-0.5 rounded border ${isSelected ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 font-bold' : 'bg-slate-900 border-slate-700 text-slate-400'}`
+          tab.innerText = reg
+          tabsContainer.appendChild(tab)
+        })
+
+        // 東京・埼玉・千葉の3地域カードの描画
+        const cardsContainer = document.getElementById(
+          'weather-cards-container',
+        )
+        cardsContainer.innerHTML = ''
+
+        regions.forEach((reg) => {
+          const rData = datas[reg] || {}
+          const isSelected = reg === selectedRegion
+          const iconHtml = getWeatherIcon(rData['翌日の天気'])
+
+          const card = document.createElement('div')
+          card.className = `p-2.5 rounded border flex flex-col justify-between transition-all duration-300 ${isSelected ? 'bg-cyan-950/40 border-cyan-400 shadow-[0_0_10px_rgba(0,243,255,0.15)]' : 'bg-slate-900/60 border-slate-800 opacity-70'}`
+
+          card.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-1 mb-1">
+                        <span class="font-bold text-xs ${isSelected ? 'text-cyan-300' : 'text-slate-300'}">${reg}</span>
+                        <span class="text-sm">${iconHtml}</span>
+                    </div>
+                    <div class="font-mono-tech text-xl font-bold ${isSelected ? 'text-cyan-200 glow-cyan' : 'text-slate-300'}">
+                        ${rData['現在の気温'] || '--'}
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono-tech flex justify-between mt-1">
+                        <span>雨: ${rData['現在の降水量(10分あたり)'] || '0mm'}</span>
+                    </div>
+                    <div class="text-[10px] ${isSelected ? 'text-cyan-400' : 'text-slate-400'} truncate mt-0.5 font-medium">
+                        明日: ${rData['翌日の天気'] || '--'}
+                    </div>
+                `
+          cardsContainer.appendChild(card)
+        })
+
+        // 選択中の地域に関する天気概況の描画
+        const selectedData = datas[selectedRegion] || {}
+        document.getElementById('overview-region-label').innerText =
+          selectedRegion
+        document.getElementById('weather-summary').innerText = (
+          selectedData['天気概況'] || ''
+        ).trim()
+
+        // 天気地域切り替えプログレスバーのアニメーション駆動
+        const progressBar = document.getElementById('weather-progress')
+        progressBar.style.transition = 'none'
+        progressBar.style.width = '0%'
+
+        setTimeout(() => {
+          progressBar.style.transition = `width ${WEATHER_REGION_DURATION}ms linear`
+          progressBar.style.width = '100%'
+        }, 50)
+      }
+
+      // 地域（東京 -> 埼玉 -> 千葉）の10秒間隔での自動巡回切り替え
+      function startRegionAutoCycle() {
+        if (regionCycleTimer) clearInterval(regionCycleTimer)
+        regionCycleTimer = setInterval(() => {
+          if (!weatherData || !weatherData.datas) return
+          const regions = Object.keys(weatherData.datas)
+          if (regions.length === 0) return
+
+          const currentIndex = regions.indexOf(selectedRegion)
+          const nextIndex = (currentIndex + 1) % regions.length
+          selectedRegion = regions[nextIndex]
+          renderWeather()
+        }, WEATHER_REGION_DURATION)
+      }
+
+      // 外部PHP（./getNews.php）からニュース情報を取得
+      async function fetchNewsData() {
+        try {
+          const res = await fetch('./getNews.php', { cache: 'no-cache' })
+          if (!res.ok) throw new Error('ネットワークエラー')
+          const data = await res.json()
+          if (Array.isArray(data) && data.length > 0) {
+            newsData = data
+          } else {
+            newsData = MOCK_NEWS
+          }
+        } catch (err) {
+          console.warn(
+            '外部ニュース情報の取得に失敗したため、モックデータを使用します:',
+            err,
+          )
+          newsData = MOCK_NEWS
+        }
+        currentNewsIndex = 0
+        displayNewsItem()
+      }
+
+      // ニュースを2件ずつ切り替えて表示する関数
+      function displayNewsItem() {
+        if (!newsData || newsData.length === 0) return
+
+        const item0 = document.getElementById('newsItem0')
+        const item1 = document.getElementById('newsItem1')
+        const title0 = document.getElementById('newsTitle0')
+        const desc0 = document.getElementById('newsDesc0')
+        const title1 = document.getElementById('newsTitle1')
+        const desc1 = document.getElementById('newsDesc1')
+        const progressBar = document.getElementById('news-progress')
+
+        // フェードアウト効果
+        item0.style.opacity = '0'
+        item1.style.opacity = '0'
+
+        setTimeout(() => {
+          // 上側ニュース (1件目) のセット
+          const news1 = newsData[currentNewsIndex]
+          title0.textContent = news1 ? news1.title : '---'
+          desc0.textContent = news1 ? news1.description : ''
+
+          // 下側ニュース (2件目) のセット
+          const nextIdx = (currentNewsIndex + 1) % newsData.length
+          const news2 = newsData[nextIdx]
+          title1.textContent = news2 ? news2.title : '---'
+          desc1.textContent = news2 ? news2.description : ''
+
+          // インデックス表示の更新 (例: 1-2 / 10)
+          const endIdx = Math.min(currentNewsIndex + 2, newsData.length)
+          document.getElementById('news-index').innerText =
+            `${currentNewsIndex + 1}-${endIdx} / ${newsData.length}`
+
+          // フェードイン効果
+          item0.style.opacity = '1'
+          item1.style.opacity = '1'
+
+          // プログレスバーのアニメーションリセットと開始
+          progressBar.style.transition = 'none'
+          progressBar.style.width = '0%'
+
+          setTimeout(() => {
+            progressBar.style.transition = `width ${NEWS_DISPLAY_DURATION}ms linear`
+            progressBar.style.width = '100%'
+          }, 50)
+
+          if (newsTimer) clearTimeout(newsTimer)
+
+          // 16秒後に2件ずつ進める
+          newsTimer = setTimeout(() => {
+            currentNewsIndex += 2
+            if (currentNewsIndex >= newsData.length) {
+              currentNewsIndex = 0
+              newsCycleCounter++
+              document.getElementById('news-cycle-count').innerText =
+                `周回数: #${newsCycleCounter}`
+              fetchNewsData() // 全ニュース周回完了により最新情報を再取得
+            } else {
+              displayNewsItem()
+            }
+          }, NEWS_DISPLAY_DURATION)
+        }, 500)
+      }
+
+      // ページ読み込み完了時の初期化処理
+      window.onload = function () {
+        updateClock()
+        setInterval(updateClock, 1000)
+
+        // 初回データ取得
+        fetchTrafficData()
+        fetchWeatherData()
+        fetchNewsData()
+
+        // 地域切り替えタイマー開始
+        startRegionAutoCycle()
+
+        // 10分（600,000ミリ秒）毎の自動データ更新タイマー
+        setInterval(() => {
+          fetchTrafficData()
+          fetchWeatherData()
+        }, 600000)
+      }
+    </script>
+  </body>
+</html>
